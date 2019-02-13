@@ -17,7 +17,7 @@ function! s:translator.start(lines)
         return -1
     endif
 
-    let cmd = printf("%s %s %s %s", python_cmd, s:translator_file, g:simple_translator_engine, a:lines)
+    let cmd = printf('%s %s %s "%s"', python_cmd, s:translator_file, g:simple_translator_engine, a:lines)
     if exists('*jobstart')
         return jobstart(cmd, self)
     elseif exists('*job_start') && ! has("gui_macvim")
