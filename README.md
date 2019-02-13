@@ -1,46 +1,53 @@
-# vim youdao translater
+# simple translater
 
-vim youdao translater 是一个利用 [有道词典在线版](http://dict.youdao.com/) 制作的vim插件，可以帮你在 vim 中翻译单词或语句
+simple translater 是一个利用在线词典的 API 制作的vim插件，可以帮你在 vim 中翻译单词或语句
+
+目前支持的词典引擎
+
+* [有道翻译](http://dict.youdao.com/)
+* [搜狗翻译](https://fanyi.sogou.com/)
 
 ## 安装
 
-### 普通安装:
-把所有文件拷贝到 `~/.vim/` 目录下，就可以用了。
-
-
 ### pathogen 安装：
+
 如果装有 pathogen 可以 :
 
-	cd ~/.vim/bundle
-	git clone git@github.com:ianva/vim-youdao-translater.git
+    cd ~/.vim/bundle
+    git clone git@github.com:FlyingFishBird/simple-translater.git
 
+### vim-plug 安装：
 
-###  其他
-添加 `~/.vimrc` 文件：
+vimrc 中添加如下配置
+
+    Plug 'FlyingFishBird/simple-translator'
+
+##  其他
+
+### 添加快捷键映射到 vimrc 文件：
 
 ```vim
-vnoremap <silent> <C-T> :<C-u>Ydv<CR>
-nnoremap <silent> <C-T> :<C-u>Ydc<CR>
-noremap <leader>yd :<C-u>Yde<CR>
+vnoremap <silent> <leader>q :<C-u>Stv<CR>
+nnoremap <silent> <leader>q :<C-u>Stc<CR>
+noremap <leader>Q :<C-u>Ste<CR>
 ```
 
-## 如何使用
+在普通模式下，点击引导键再点q， 会翻译当前光标下的单词；
 
-在普通模式下，按 `ctrl+t`， 会翻译当前光标下的单词；
+在 `visual` 模式下选中单词或语句，点击引导键再点q，会翻译选择的单词或语句；
 
-在 `visual` 模式下选中单词或语句，按 `ctrl+t`，会翻译选择的单词或语句；
-
-点击引导键再点y，d，可以在命令行输入要翻译的单词或语句；
+点击引导键再点Q，可以在命令行输入要翻译的单词或语句；
 
 译文将会在编辑器底部的命令栏显示。
 
+### 配置查询引擎
 
+默认使用 sogou 的查询引擎。如果需要换成有道。在 vimrc 添加如下配置：
 
-## License
+    let g:simple_translator_engine = 'youdao'
 
-The MIT License (MIT)
+### 开源项目参考
 
-Copyright (c) ianva
-
-
-
+* 项目 fork 并修改自 [vim-youdao-translater](https://github.com/ianva/vim-youdao-translater) 非常感谢原作者的分享。
+* 添加 sogou 搜索是因为我个人很喜欢 chrome 浏览器中的 [达达划词翻译](https://github.com/waynecz/dadda-translate-crx) 插件。
+它在长文本翻译的时候感觉很准确。源码参考了其实现。
