@@ -13,6 +13,7 @@ else:
     from urllib2 import Request, urlopen
 
 WARN_NOT_FIND = ' 找不到释义'
+ERROR_SOGOU_CONFIG = ' 找不到搜狗配置文件或配置有误'
 ERROR_QUERY = ' 翻译查询出错'
 NETWORK_ERROR = ' 无法连接翻译服务器'
 

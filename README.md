@@ -46,8 +46,11 @@ noremap <leader>Q :<C-u>Ste<CR>
 
     let g:simple_translator_engine = 'youdao'
 
+### 配置搜狗翻译
+
+搜狗翻译是收费翻译。需要你[自行申请](https://deepi.sogou.com/registered/texttranslate)
+然后将 **pid 和 key** 两个字段保存为 json 文件存放在 ~/.sogoufanyi.json 中
+
 ### 开源项目参考
 
-* 项目 fork 并修改自 [vim-youdao-translater](https://github.com/ianva/vim-youdao-translater) 非常感谢原作者的分享。
-* 添加 sogou 搜索是因为我个人很喜欢 chrome 浏览器中的 [达达划词翻译](https://github.com/waynecz/dadda-translate-crx) 插件。
-它在长文本翻译的时候感觉很准确。源码参考了其实现。
+项目 fork 并修改自 [vim-youdao-translater](https://github.com/ianva/vim-youdao-translater) 非常感谢原作者的分享。

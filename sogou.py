@@ -1,33 +1,27 @@
 # -*- coding: utf-8 -*-
 
 from hashlib import md5
-from random import randint
 from utils import *
 import json
+import os
+import time
 
-_COUNTRY = {'uk': u'英', 'usa': u'美'}
+_CONF_FILE = os.path.join(os.environ.get('HOME'), '.sogoufanyi.json')
+
+_CONF_KEY_PID = 'pid'
+_CONF_KEY_KEY = 'key'
 
 
-def _uuid():
-    t = 0
-    line_n = (8, 12, 16, 20)
-    r = []
+# 加载翻译配置
+def _load_conf():
+    try:
+        with open(_CONF_FILE) as fp:
+            return json.load(fp)
+    except:
+        return {}
 
-    while t < 32:
-        if t in line_n:
-            r.append('-')
-        e = randint(0, 15)
-        if t == 12:
-            n = 4
-        elif t == 16:
-            n = 3 & e | 8
-        else:
-            n = e
-        r.append(hex(n)[2:])
 
-        t += 1
-
-    return ''.join(r)
+_SOGOU_CONF = _load_conf()
 
 
 def _format(data):
@@ -35,61 +29,40 @@ def _format(data):
         d = json.loads(data)
     except Exception as _:
         return WARN_NOT_FIND
-
-    if d['status'] != 0:
+    if d['errorCode'] != '0':
         return WARN_NOT_FIND
-    res = d['data']
-    trans = res['translate']
 
-    phonetic = get_val(res, 'common_dict.oxford.dict.0.content.0.phonetic')
-
-    ret = []
-    if phonetic:
-        ps = [trans['text']]
-        for k in phonetic:
-            c = k['type']
-            ps.append('%s: %s' % (_COUNTRY.get(c, c), k['text']))
-        if ps:
-            ret.append(' | '.join(ps))
-    else:
-        ret.append(trans['text'])
-    ret.append(trans['dit'])
-    return ' # '.join(ret)
+    return d['query'] + ' # ' + d['translation']
 
 
 def translate(text):
+    # 判断配置文件是否正确
+    pid, key = _SOGOU_CONF.get(_CONF_KEY_PID), _SOGOU_CONF.get(_CONF_KEY_KEY)
+    if not pid or not key:
+        return ERROR_SOGOU_CONFIG + ' ' + _CONF_FILE
+
     text = text.strip()
     if not text:
         return ''
-
-    lan_from, lan_to = 'auto', 'zh-CHS'
+    # 生成 sign
+    salt = str(int(time.time()))
     m = md5()
-    m.update((lan_from + lan_to + text +
-              '41ee21a5ab5a13f72687a270816d1bfd').encode())
+    m.update((pid + text + salt + key).encode())
     s = m.hexdigest()
 
-    text = url_quote(text).replace('%20', '+')
-
     payload = {
-        'from': lan_from,
-        'to': lan_to,
-        'client': 'pc',
-        'fr': 'browser_pc',
-        'needQc': 1,
-        'uuid': _uuid(),
-        'pid': 'sogou-dict-vr',
-        'oxford': 'on',
-        'useDetect': 'off',
-        'useDetectResult': 'off',
-        'isReturnSugg': 'off',
-        's': s
+        'q': text,
+        'from': 'auto',
+        'to': 'zh-CHS',
+        'pid': pid,
+        'salt': salt,
+        'sign': s,
     }
-
-    url = 'https://fanyi.sogou.com/reventondc/translateV1'
-    data = urlencode(payload) + '&text=' + text
-    req = Request(url, data.encode())
+    url = 'http://fanyi.sogou.com/reventondc/api/sogouTranslate'
+    data = urlencode(payload)
+    req = Request(url, data.encode(), headers={'Accept': 'application/json'})
     try:
-        resp = urlopen(req)
+        resp = urlopen(req, None)
     except Exception as e:
         return NETWORK_ERROR
 
@@ -97,5 +70,4 @@ def translate(text):
         return ERROR_QUERY
 
     res = resp.read()
-
     return _format(res)
